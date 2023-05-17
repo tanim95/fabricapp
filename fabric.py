@@ -359,12 +359,12 @@ def generate_fabric_image(epi, ppi, weaving_pattern, yarn_count):
 
     fabric_image = np.zeros((ppi, epi, 3), dtype=np.uint8)
 
-    # Set the RGB values based on the weaving pattern and yarn count
+    # RGB values based on the weaving pattern and yarn count
     for i in range(ppi):
         for j in range(epi):
             if weaving_pattern[i % len(weaving_pattern)] == '1':
                 if (i % 2 == 0 and j % 2 == 0) or (i % 2 != 0 and j % 2 != 0):
-                    fabric_image[i, j] = [0, 255, 0]  # Red color for weave
+                    fabric_image[i, j] = [255, 0, 0]  # Red color for weave
                 else:
                     # Blue color for non-weave
                     fabric_image[i, j] = [0, 0, yarn_count]
