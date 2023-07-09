@@ -1,10 +1,6 @@
-
-from flask import Flask, render_template, request, send_file
+import streamlit as st
 import numpy as np
 from PIL import Image
-
-app = Flask(__name__)
-
 
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
@@ -12,7 +8,6 @@ def hex_to_rgb(hex_color):
     g = int(hex_color[2:4], 16)
     b = int(hex_color[4:6], 16)
     return [r, g, b]
-
 
 def generate_fabric_image(screen_width, screen_height, weaving_pattern, epi, ppi, epi_color, ppi_color):
     square_size = 10
@@ -38,32 +33,25 @@ def generate_fabric_image(screen_width, screen_height, weaving_pattern, epi, ppi
     image = Image.fromarray(thickened_fabric_image)
     return image, None
 
+def main():
+    st.title('Fabric Pattern Generator')
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+    weaving_pattern = st.text_input('Weaving Pattern')
+    epi = st.number_input('Ends Per Inch (EPI)', value=10)
+    ppi = st.number_input('Picks Per Inch (PPI)', value=10)
+    epi_color = st.color_picker('EPI Color')
+    ppi_color = st.color_picker('PPI Color')
 
+    if st.button('Generate Pattern'):
+        # screen resolution
+        screen_width, screen_height = 800, 600
+        image, error = generate_fabric_image(
+            screen_width, screen_height, weaving_pattern, epi, ppi, epi_color, ppi_color)
 
-@app.route('/generate', methods=['POST'])
-def generate():
-    weaving_pattern = request.form['weaving_pattern']
-    epi = int(request.form['epi'])
-    ppi = int(request.form['ppi'])
-    epi_color = hex_to_rgb(request.form['epi_color'])
-    ppi_color = hex_to_rgb(request.form['ppi_color'])
-
-    #  screen resolution
-    screen_width, screen_height = 800, 600
-    image, error = generate_fabric_image(
-        screen_width, screen_height, weaving_pattern, epi, ppi, epi_color, ppi_color)
-
-    if error:
-        return render_template('index.html', error=error)
-
-    image_path = 'patterns/fabric_pattern.png'
-    image.save(image_path)
-    return send_file(image_path, mimetype='image/png')
-
+        if error:
+            st.error(error)
+        else:
+            st.image(image, caption='Fabric Pattern', use_column_width=True)
 
 if __name__ == '__main__':
-    app.run()
+    main()
